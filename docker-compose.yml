@@ -1,0 +1,41 @@
+services:
+  syncer:
+    build: .
+    restart: always
+    networks:
+      - sync-network
+
+  mongo:
+    image: mongo
+    depends_on:
+      - syncer
+    volumes:
+      - mongo-data-volume
+    networks:
+      - sync-network
+    resources:
+      limits:
+        cpus: '1'
+        memory: '512M'
+        
+  postgres:
+    image: postgres
+    depends_on:
+      - syncer
+    volumes:
+      - postgres-data-volume
+    networks:
+      - sync-network
+    resources:
+      limits:
+        cpus: '1'
+        memory: '512M'
+
+volumes:
+  postgres-data-volume:
+  mongo-data-volume:
+
+networks:
+  sync-network:
+    driver: bridge
+    name: delta-sync-network
